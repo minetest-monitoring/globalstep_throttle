@@ -4,16 +4,23 @@ local throttled_mod_names = {}
 throttled_mod_names["mesecons"] = true
 throttled_mod_names["advtrains"] = true
 
+local metrics = {}
+
 minetest.register_on_mods_loaded(function()
   for i, globalstep in ipairs(minetest.registered_globalsteps) do
 
     local info = minetest.callback_origins[globalstep]
 
     if throttled_mod_names[info.mod] then
-      local skip_counter = monitoring.counter(
-        "globalstep_skip_counter_" .. info.mod,
-        "count of skipped calls for globalsteps in mod " .. info.mod
-      )
+      local skip_counter = metrics[info.mod]
+
+      if not skip_counter then
+        skip_counter = monitoring.counter(
+          "globalstep_skip_counter_" .. info.mod,
+          "count of skipped calls for globalsteps in mod " .. info.mod
+        )
+        metrics[info.mod] = skip_counter
+      end
 
       local last_call = 0
       local acc_dtime = 0
