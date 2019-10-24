@@ -38,6 +38,7 @@ minetest.register_on_mods_loaded(function()
         else
           -- execute callback
           globalstep(acc_dtime)
+          last_call = now
           acc_dtime = 0
 
         end
